@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
  * @author Alexis Mas
  */
 @RunWith(JUnit4.class)
-public class DrivingTimeTest {
+public class When_there_is_no_available_time {
 
     private static final String NO_TIME_EXPECTED = "No remaining time expected.";
 
@@ -53,17 +53,25 @@ public class DrivingTimeTest {
         drivingTime = new DrivingTime(completedWorkingTime);
         drivingTime.analyze(now);
     }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testDrivingTime_oddInput() {
-        DrivingTime dt = new DrivingTime(new Date[]{now.toDate()});
-    }
+//
+//    @Test(expected = IllegalArgumentException.class)
+//    public void testCreateDrivingTime_OddInput_ShouldThrowException() {
+//        DrivingTime dt = new DrivingTime(new Date[]{now.toDate()});
+//    }
 
 
     @Test
-    public void testFullWorkingTime() {
+    public void day_driving_time_should_be_zero() {
         assertEquals(NO_TIME_EXPECTED, 0, drivingTime.day().getMillis());
+    }
+
+    @Test
+    public void week_driving_time_should_be_zero() {
         assertEquals(NO_TIME_EXPECTED, 0, drivingTime.week().getMillis());
+    }
+
+    @Test
+    public void fortnight_driving_time_should_be_zero() {
         assertEquals(NO_TIME_EXPECTED, 0, drivingTime.fortnight().getMillis());
     }
 }
