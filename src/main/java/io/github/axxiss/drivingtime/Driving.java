@@ -1,32 +1,35 @@
 package io.github.axxiss.drivingtime;
 
+import org.joda.time.Duration;
+
 /**
- * Created with IntelliJ IDEA.
- * User: alexis
- * Date: 03/10/13
- * Time: 13:03
- * To change this template use File | Settings | File Templates.
+ * @author Alexis Mas
  */
 public class Driving {
+
+
+    private static final long minutesToMillis = 60 * 1000;
+    private static final long hoursToMillis = 60 * minutesToMillis;
+
 
     /**
      * Maximum daily driving time, 9 hours.
      */
-    public static final int DAILY = 9 * 60;
+    public static final Duration DAILY = new Duration(9 * hoursToMillis);
 
 
     /**
      * Maximum nonstop driving time, 4,5 hours
      */
-    public static final int NONSTOP = 4 * 60 + 30;
+    public static final Duration NONSTOP = new Duration(4 * hoursToMillis + (30 * minutesToMillis));
 
     /**
      * * Maximum weekly driving time, 56 hours
      */
-    public static final int WEEKLY = 56 * 60;
+    public static final Duration WEEKLY = new Duration(56 * hoursToMillis);
 
     /**
      * * Maximum fortnightly driving time, 90 hours
      */
-    public static final int FORTNIGHTLY = 90 * 60;
+    public static final Duration FORTNIGHTLY = new Duration(90 * hoursToMillis);
 }
