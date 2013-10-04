@@ -1,0 +1,20 @@
+group = 'io.github.axxiss'
+version = '0.1.0'
+description = 'Driving time and rest periods'
+
+//Language
+apply plugin: 'java'
+
+// IDE
+apply plugin: 'idea'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+
+dependencies {
+    testCompile 'junit:junit:4.11'
+}
+
