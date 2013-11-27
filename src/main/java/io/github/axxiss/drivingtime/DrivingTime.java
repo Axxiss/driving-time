@@ -1,6 +1,7 @@
 package io.github.axxiss.drivingtime;
 
-import org.joda.time.*;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
 import java.util.Date;
 
@@ -11,172 +12,123 @@ import java.util.Date;
  */
 public class DrivingTime {
 
-    protected final static int DAY = 24;
-    protected final static int WEEK = 7 * 24;
-    protected final static int FORTNIGHT = 15 * 24;
-
     /**
      * Driving intervals.
      */
-    private final Interval[] intervals;
-
-    /**
-     * Index of the interval where the current day start, i.e. 24 hours ago.
-     */
-    private int dayStart;
-
-    /**
-     * Index of the interval where the current week start, i.e. 7 days ago.
-     */
-    private int weekStart;
-
-    /**
-     * Index of the interval where the current fortnight start, i.e. 2 weeks ago.
-     */
-    private int fortnightStart;
-
-    /**
-     * Time drove on the last 24 hours.
-     */
-    private Duration day = new Duration(0);
-
-    /**
-     * Time drove on the last week hours.
-     */
-    private Duration week = new Duration(0);
-
-    /**
-     * Time drove on the last 2 weeks.
-     */
-    private Duration fortnight = new Duration(0);
+    private final IntervalList driveIntervals;
 
 
     /**
      * Creates a new driving time instance.
      *
-     * @param history driving history. <b><MUST/b> be sorted from oldest to newest.
+     * @param history driving history, <b><MUST/b> be sorted from oldest to newest.
      */
     public DrivingTime(Date[] history) {
         final int instants = history.length;
-
-        if (instants % 2 != 0) {
-            throw new IllegalArgumentException("History parameter must be an odd number.");
-        }
-
-        intervals = new Interval[instants / 2];
-
-
-        int j = 0;
-        for (int i = 0; i < instants; i += 2) {
-            intervals[j] = new Interval(history[i].getTime(), history[i + 1].getTime());
-            j++;
-        }
-    }
-
-    /**
-     * Analyze the provided history and calculates the available driving time at the present time.
-     */
-    public void analyze() {
-        analyze(new DateTime(DateTimeZone.UTC));
+        driveIntervals = new IntervalList(history);
     }
 
 
     /**
-     * Analyze the provided history and calculates the available driving time on the date specified
-     * by {@code when}
-     */
-    public void analyze(DateTime when) {
-        final Interval fortnightInterval = new Interval(when.minusHours(FORTNIGHT), when);
-        final Interval weekInterval = new Interval(when.minusHours(WEEK), when);
-        final Interval dayInterval = new Interval(when.minusHours(DAY), when);
-
-        final int intervalCount = intervals.length;
-
-        //find where each period start
-        fortnightStart = findStart(0, fortnightInterval);
-        weekStart = findStart(fortnightStart, weekInterval);
-        dayStart = findStart(weekStart, dayInterval);
-
-
-        //get the total amount of drove time
-        fortnight = fortnight.plus(cumulativeMillis(fortnightStart, weekStart));
-        week = week.plus(cumulativeMillis(weekStart, dayStart));
-        day = day.plus(cumulativeMillis(dayStart, intervals.length));
-
-        //add the pending result to complete the period's time
-        week = week.plus(day);
-        fortnight = fortnight.plus(week);
-    }
-
-    /**
-     * Gets the cumulative milliseconds on a interval list.
+     * Return the {@link Duration} worked over the last 24 hours.
      *
-     * @param start start index
-     * @param end   end index
-     * @return cumulative millis.
+     * @return
      */
-    private long cumulativeMillis(int start, int end) {
-        long temp = 0;
-        for (int i = start; i < end; i++) {
-            temp += intervals[i].toDurationMillis();
-        }
-        return temp;
+    public Duration lastDay(DateTime when) {
+        return driveIntervals.getDriveDuration(when.minusDays(1), when);
     }
 
-
     /**
-     * Search into {@link #intervals} for the index where a week, day or a fortnight start.
+     * Return the {@link Duration} worked over the last 7 days.
      *
-     * @param start    index to start the search
-     * @param interval interval to search for
-     * @return interval's start index
+     * @return
      */
-    private int findStart(int start, ReadableInterval interval) {
-        while (start < intervals.length && !intervals[start].overlaps(interval)) {
-            start++;
-        }
-        return start;
+    public Duration lastWeek(DateTime when) {
+        return driveIntervals.getDriveDuration(when.minusWeeks(1), when);
     }
 
+    /**
+     * Return the {@link Duration} worked over the last 15 days.
+     *
+     * @return
+     */
+    public Duration lastFortnight(DateTime when) {
+        return driveIntervals.getDriveDuration(when.minusWeeks(2), when);
+    }
 
     /**
-     * Calculates how much time the driver is allowed to drive in the next 24 hours.
+     * Calculates how much time is available for driving in the next 24 hours.
      *
-     * @return available minutes
+     * @return
      */
-    public Duration day() {
-        if (week().getMillis() == 0 || !Driving.DAILY.isLongerThan(day)) {
+    public Duration nextDay() {
+        DateTime when = DateTime.now().plusDays(1);
+
+        Duration day = available(Driving.DAILY, lastDay(when));
+        Duration week = available(Driving.WEEKLY, lastWeek(when));
+        Duration fortnight = available(Driving.FORTNIGHTLY, lastFortnight(when));
+
+        Duration min = minDuration(day, Driving.DAILY);
+        min = minDuration(week, min);
+        min = minDuration(fortnight, min);
+
+        return min;
+    }
+
+    /**
+     * Calculates how much time is available for driving in the next 7 days.
+     *
+     * @return
+     */
+    public Duration nextWeek() {
+        DateTime when = DateTime.now().plusWeeks(1);
+
+        Duration fortnight = available(Driving.FORTNIGHTLY, lastFortnight(when));
+        Duration min = minDuration(fortnight, Driving.FORTNIGHTLY);
+
+        return min;
+    }
+
+    /**
+     * Calculates how much time is available for driving in the next 14 days.
+     *
+     * @return
+     */
+    public Duration nextFortnight() {
+        return Driving.FORTNIGHTLY;
+    }
+
+    /**
+     * Given a maximum and a current duration calculates the difference between the maximum
+     * and the current duration. If the duration is greater than the maximum the duration returned
+     * will be zero.
+     *
+     * @param maximum the maximum duration.
+     * @param current the current duration.
+     * @return maximum - current
+     */
+    public Duration available(Duration maximum, Duration current) {
+        if (current.isLongerThan(maximum)) {
             return new Duration(0);
         } else {
-            return Driving.DAILY.minus(day);
-        }
-    }
-
-
-    /**
-     * Calculates how much time the driver is allowed to drive in the next 7 days.
-     *
-     * @return available minutes
-     */
-    public Duration week() {
-
-        if (fortnight().getMillis() == 0 || !Driving.WEEKLY.isLongerThan(week)) {
-            return new Duration(0);
-        } else {
-            return Driving.WEEKLY.minus(week);
+            return maximum.minus(current);
         }
     }
 
     /**
-     * Calculates how much time the driver is allowed to drive in the next 15 days.
+     * Returns the minimum {@link Duration}
      *
-     * @return available minutes
+     * @param a a duration.
+     * @param b another duration.
+     * @return min(a, b)
      */
-    public Duration fortnight() {
-        if (Driving.FORTNIGHTLY.isLongerThan(fortnight)) {
-            return Driving.FORTNIGHTLY.minus(fortnight);
+    private Duration minDuration(Duration a, Duration b) {
+        if (a.isShorterThan(b)) {
+            return a;
         } else {
-            return new Duration(0);
+            return b;
         }
     }
+
+
 }

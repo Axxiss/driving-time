@@ -13,9 +13,9 @@ public class Driving {
 
 
     /**
-     * Maximum daily driving time, 9 hours.
+     * Normal daily driving time, 9 hours.
      */
-    public static final Duration DAILY = new Duration(9 * hoursToMillis);
+    public static final Duration DAILY = new Duration(8 * hoursToMillis);
 
 
     /**
