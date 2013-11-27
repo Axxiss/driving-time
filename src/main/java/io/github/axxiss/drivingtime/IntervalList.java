@@ -1,6 +1,5 @@
 package io.github.axxiss.drivingtime;
 
-import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
 
@@ -26,27 +25,23 @@ public class IntervalList extends ArrayList<Interval> {
     }
 
     /**
-     * Get the duration of all intervals found from {@code start}
+     * Given an interval return the amount of time that the interval list overlap.
      *
-     * @param start
-     * @return the sum of all intervals.
+     * @param interval the interval to check the overlap.
+     * @return the overlap.
      */
-    public Duration getDriveDuration(DateTime start, DateTime end) {
-        if (end == null) {
-            end = DateTime.now();
+    public Duration overlap(Interval interval) {
+        Duration amount = new Duration(0);
+
+        for (Interval i : this) {
+            Interval match = interval.overlap(i);
+
+            if (match != null) {
+                amount.plus(match.toDurationMillis());
+            }
         }
 
-        int index = overlapStart(new Interval(start, end));
-
-        int size = size();
-
-        long millis = 0;
-
-        for (int i = index; i < size; i++) {
-            millis += get(i).toDurationMillis();
-        }
-
-        return Duration.millis(millis);
+        return amount;
     }
 
     /**
@@ -68,5 +63,22 @@ public class IntervalList extends ArrayList<Interval> {
         } else {
             return i;
         }
+    }
+
+    public int findGap(int start, Duration gap) {
+
+        int i = start;
+
+        boolean found = false;
+
+        while (i < size() - 1 && !found) {
+            Duration currentGap = get(i).gap(get(i + 1)).toDuration();
+
+            if (currentGap.compareTo(gap) >= 0) {
+                found = true;
+            }
+        }
+
+        return i;
     }
 }

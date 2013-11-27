@@ -2,6 +2,7 @@ package io.github.axxiss.drivingtime;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+import org.joda.time.Interval;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +28,7 @@ public class DrivingTimeTest {
     @Before
     public void setUp() throws Exception {
         drivingTime = spy(new DrivingTime(new Date[0]));
+        drivingTime.driveIntervals = spy(new IntervalList(new Date[0]));
     }
 
     @Test
@@ -55,7 +57,7 @@ public class DrivingTimeTest {
 
         Duration available = drivingTime.nextDay();
 
-        assertEquals(9.0, available.getStandardHours(), 0);
+        assertEquals(Driving.DAILY.getMillis(), available.getMillis());
     }
 
     @Test
@@ -66,7 +68,31 @@ public class DrivingTimeTest {
         mockWorkTime(day, day, fortnight);
 
         Duration available = drivingTime.nextWeek();
-        assertEquals(56.0, available.getStandardHours(), 0);
+        assertEquals(Driving.WEEKLY.getMillis(), available.getMillis());
+    }
+
+    @Test
+    public void nextFortnight() {
+        Duration day = new Duration(0);
+
+        mockWorkTime(day, day, day);
+
+        Duration available = drivingTime.nextWeek();
+        assertEquals(90.0, available.getStandardHours(), 0);
+    }
+
+    @Test
+    public void nonstop_noOverlap() {
+        doReturn(-1).when(drivingTime.driveIntervals).overlapStart(any(Interval.class));
+
+        assertEquals(Driving.NONSTOP.getMillis(), drivingTime.nonstop().getMillis());
+    }
+
+    @Test
+    public void nonstop_overlap() {
+        doReturn(10).when(drivingTime.driveIntervals).overlapStart(any(Interval.class));
+
+        assertEquals(Driving.NONSTOP.getMillis(), drivingTime.nonstop().getMillis());
     }
 
     /**

@@ -2,8 +2,12 @@ package io.github.axxiss.drivingtime;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+import org.joda.time.Interval;
 
 import java.util.Date;
+
+import static io.github.axxiss.drivingtime.Utils.available;
+import static io.github.axxiss.drivingtime.Utils.minDuration;
 
 /**
  * Calculates a driver's available driving time.
@@ -15,7 +19,7 @@ public class DrivingTime {
     /**
      * Driving intervals.
      */
-    private final IntervalList driveIntervals;
+    protected IntervalList driveIntervals;
 
 
     /**
@@ -35,7 +39,7 @@ public class DrivingTime {
      * @return
      */
     public Duration lastDay(DateTime when) {
-        return driveIntervals.getDriveDuration(when.minusDays(1), when);
+        return driveIntervals.overlap(new Interval(when.minusDays(1), when));
     }
 
     /**
@@ -44,7 +48,7 @@ public class DrivingTime {
      * @return
      */
     public Duration lastWeek(DateTime when) {
-        return driveIntervals.getDriveDuration(when.minusWeeks(1), when);
+        return driveIntervals.overlap(new Interval(when.minusWeeks(1), when));
     }
 
     /**
@@ -53,7 +57,7 @@ public class DrivingTime {
      * @return
      */
     public Duration lastFortnight(DateTime when) {
-        return driveIntervals.getDriveDuration(when.minusWeeks(2), when);
+        return driveIntervals.overlap(new Interval(when.minusWeeks(2), when));
     }
 
     /**
@@ -99,35 +103,28 @@ public class DrivingTime {
     }
 
     /**
-     * Given a maximum and a current duration calculates the difference between the maximum
-     * and the current duration. If the duration is greater than the maximum the duration returned
-     * will be zero.
+     * Calculates how much time is available for nonstop-driving
      *
-     * @param maximum the maximum duration.
-     * @param current the current duration.
-     * @return maximum - current
+     * @return
      */
-    public Duration available(Duration maximum, Duration current) {
-        if (current.isLongerThan(maximum)) {
-            return new Duration(0);
-        } else {
-            return maximum.minus(current);
-        }
-    }
+    public Duration nonstop() {
+        DateTime now = DateTime.now();
+        DateTime start = now.minus(Driving.NONSTOP);
 
-    /**
-     * Returns the minimum {@link Duration}
-     *
-     * @param a a duration.
-     * @param b another duration.
-     * @return min(a, b)
-     */
-    private Duration minDuration(Duration a, Duration b) {
-        if (a.isShorterThan(b)) {
-            return a;
-        } else {
-            return b;
+        Interval interval = new Interval(start, now);
+
+        int index = driveIntervals.overlapStart(interval);
+
+        if (index == -1) {
+            return Driving.NONSTOP;
         }
+
+
+        int gap = driveIntervals.findGap(index, Driving.NONSTOP);
+
+
+        return Driving.FORTNIGHTLY;
+
     }
 
 
