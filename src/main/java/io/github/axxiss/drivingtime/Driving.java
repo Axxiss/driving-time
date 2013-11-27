@@ -8,14 +8,14 @@ import org.joda.time.Duration;
 public class Driving {
 
 
-    private static final long minutesToMillis = 60 * 1000;
-    private static final long hoursToMillis = 60 * minutesToMillis;
+    protected static final long minutesToMillis = 60 * 1000;
+    protected static final long hoursToMillis = 60 * minutesToMillis;
 
 
     /**
      * Normal daily driving time, 9 hours.
      */
-    public static final Duration DAILY = new Duration(8 * hoursToMillis);
+    public static final Duration DAILY = new Duration(9 * hoursToMillis);
 
 
     /**

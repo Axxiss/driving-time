@@ -46,22 +46,42 @@ public class DrivingTimeTest {
 
     @Test
     public void nextDay() {
-        DateTime now = DateTime.now();
 
-        DateTime dt = now;
+        Duration day = new Duration(0);
+        Duration week = new Duration(40 * Driving.hoursToMillis);
+        Duration fortnight = new Duration(80 * Driving.hoursToMillis);
 
-
-        Duration day = new Duration(now.getMillis(), dt.plusHours(0).getMillis());
-        Duration week = new Duration(now.getMillis(), dt.plusHours(40).getMillis());
-        Duration fortnight = new Duration(now.getMillis(), dt.plusHours(80).getMillis());
-
-        doReturn(day).when(drivingTime).lastDay(any(DateTime.class));
-        doReturn(week).when(drivingTime).lastWeek(any(DateTime.class));
-        doReturn(fortnight).when(drivingTime).lastFortnight(any(DateTime.class));
-
+        mockWorkTime(day, week, fortnight);
 
         Duration available = drivingTime.nextDay();
 
-        assertEquals(8.0, available.getStandardHours(), 0);
+        assertEquals(9.0, available.getStandardHours(), 0);
+    }
+
+    @Test
+    public void nextWeek() {
+        Duration day = new Duration(0);
+        Duration fortnight = new Duration(34 * Driving.hoursToMillis);
+
+        mockWorkTime(day, day, fortnight);
+
+        Duration available = drivingTime.nextWeek();
+        assertEquals(56.0, available.getStandardHours(), 0);
+    }
+
+    /**
+     * Do a partial mock of driving time, returning the passed duration when
+     * {@link DrivingTime#lastDay(org.joda.time.DateTime)},
+     * {@link DrivingTime#lastWeek(org.joda.time.DateTime)} or
+     * {@link DrivingTime#lastFortnight(org.joda.time.DateTime)} are called.
+     *
+     * @param day       the mock duration of a last day.
+     * @param week      the mock duration of a last week.
+     * @param fortnight the mock duration of a last fortnight.
+     */
+    private void mockWorkTime(Duration day, Duration week, Duration fortnight) {
+        doReturn(day).when(drivingTime).lastDay(any(DateTime.class));
+        doReturn(week).when(drivingTime).lastWeek(any(DateTime.class));
+        doReturn(fortnight).when(drivingTime).lastFortnight(any(DateTime.class));
     }
 }
