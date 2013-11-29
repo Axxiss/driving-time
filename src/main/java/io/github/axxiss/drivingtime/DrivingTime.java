@@ -132,21 +132,4 @@ public class DrivingTime {
 
         return Driving.NONSTOP.minus(overlap);
     }
-
-
-    /**
-     * Check for normal non-stop.
-     */
-    private void nonStopNormal() {
-
-    }
-
-    /**
-     * Check for split non stop.
-     */
-    private void nonStopSplit() {
-
-    }
-
-
 }
