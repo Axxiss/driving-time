@@ -1,5 +1,6 @@
 package io.github.axxiss.drivingtime.rules;
 
+import io.github.axxiss.drivingtime.BaseTest;
 import io.github.axxiss.drivingtime.IntervalList;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.*;
  * To change this template use File | Settings | File Templates.
  */
 @RunWith(JUnit4.class)
-public class DayTest {
+public class DayTest extends BaseTest {
 
     IntervalList intervals;
 
@@ -32,29 +33,29 @@ public class DayTest {
     }
 
     @Test
-    public void calcAvailable_normal() {
-        mockData(2, 0);
-        Day day = new Day(intervals, DateTime.now());
-        assertEquals(day.getMax(), day.getAvailable());
-
-
-        long twoHours = 2 * Rule.hoursToMillis;
-        mockData(2, twoHours);
-        Day aDay = new Day(intervals, DateTime.now());
-        assertEquals(aDay.getMax().minus(twoHours), aDay.getAvailable());
+    public void available_normal() {
+        assertAvailable(2, 0, nineHours);
+        assertAvailable(2, oneHour, eightHours);
+        assertAvailable(2, fourHours, fiveHours);
+        assertAvailable(2, eightHours, oneHour);
+        assertAvailable(2, tenHours, 0);
     }
 
 
     @Test
-    public void calcAvailable_overtime() {
-        mockData(1, 0);
-        Day day = new Day(intervals, DateTime.now());
-        assertEquals(day.maxOvertime, day.getAvailable());
+    public void available_overtime() {
+        assertAvailable(0, 0, tenHours);
+        assertAvailable(0, oneHour, nineHours);
+        assertAvailable(0, fourHours, sixHours);
+        assertAvailable(0, nineHours, oneHour);
+        assertAvailable(0, tenHours, 0);
     }
 
-    private void mockData(int countDuration, long overlap) {
-        Duration d = new Duration(overlap);
-        doReturn(d).when(intervals).overlap(any(Interval.class));
-        doReturn(countDuration).when(intervals).countDurationInterval(any(Interval.class), any(Duration.class), any(Duration.class));
+    private void assertAvailable(int overtime, long driving, long expected) {
+        doReturn(new Duration(driving)).when(intervals).overlap(any(Interval.class));
+        doReturn(overtime).when(intervals).countDurationInterval(any(Interval.class), any(Duration.class), any(Duration.class));
+
+        Day day = new Day(intervals, DateTime.now());
+        assertEquals(new Duration(expected), day.getAvailable());
     }
 }

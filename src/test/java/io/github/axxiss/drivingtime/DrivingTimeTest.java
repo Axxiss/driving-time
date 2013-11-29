@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import static io.github.axxiss.drivingtime.rules.Rule.hoursToMillis;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -22,21 +21,10 @@ import static org.mockito.Mockito.when;
  * To change this template use File | Settings | File Templates.
  */
 @RunWith(JUnit4.class)
-public class DrivingTimeTest {
-
-    DrivingTime drivingTime;
-
+public class DrivingTimeTest extends BaseTest {
     Day day;
     Week week;
     Fortnight fortnight;
-
-
-    long oneHour = 1 * hoursToMillis;
-    long threeHours = 3 * hoursToMillis;
-    long fourHours = 4 * hoursToMillis;
-    long fiveHours = 5 * hoursToMillis;
-    long eightHours = 8 * hoursToMillis;
-    long tenHours = 10 * hoursToMillis;
 
     @Before
     public void setUp() throws Exception {
