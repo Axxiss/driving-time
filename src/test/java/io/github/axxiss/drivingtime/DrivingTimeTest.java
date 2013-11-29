@@ -1,17 +1,18 @@
 package io.github.axxiss.drivingtime;
 
-import org.joda.time.DateTime;
+import io.github.axxiss.drivingtime.rules.Day;
+import io.github.axxiss.drivingtime.rules.Fortnight;
+import io.github.axxiss.drivingtime.rules.Week;
 import org.joda.time.Duration;
-import org.joda.time.Interval;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.util.Date;
-
+import static io.github.axxiss.drivingtime.rules.Rule.hoursToMillis;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,110 +26,75 @@ public class DrivingTimeTest {
 
     DrivingTime drivingTime;
 
+    Day day;
+    Week week;
+    Fortnight fortnight;
+
+
+    long oneHour = 1 * hoursToMillis;
+    long threeHours = 3 * hoursToMillis;
+    long fourHours = 4 * hoursToMillis;
+    long fiveHours = 5 * hoursToMillis;
+    long eightHours = 8 * hoursToMillis;
+    long tenHours = 10 * hoursToMillis;
+
     @Before
     public void setUp() throws Exception {
-        drivingTime = spy(new DrivingTime(new Date[0]));
-        drivingTime.driveIntervals = spy(new IntervalList(new Date[0]));
+        day = mock(Day.class);
+        week = mock(Week.class);
+        fortnight = mock(Fortnight.class);
+
+        drivingTime = new DrivingTime(day, week, fortnight);
     }
 
-    @Test
-    public void lastDay() {
-
-    }
 
     @Test
-    public void lastWeek() {
+    public void nextDay() {
+        assertNextDay(0, 0, 0, new Duration(0));
+        assertNextDay(oneHour, 0, 0, new Duration(0));
+        assertNextDay(threeHours, 0, 0, new Duration(0));
+        assertNextDay(eightHours, 0, 0, new Duration(0));
 
-    }
+        assertNextDay(oneHour, fourHours, tenHours, new Duration(oneHour));
+        assertNextDay(threeHours, fourHours, tenHours, new Duration(threeHours));
+        assertNextDay(eightHours, fourHours, tenHours, new Duration(fourHours));
 
-    @Test
-    public void lastFortnight() {
-
-    }
-
-    @Test
-    public void nextDay_normal() {
-        Duration day = new Duration(0);
-        Duration week = new Duration(40 * Driving.hoursToMillis);
-        Duration fortnight = new Duration(80 * Driving.hoursToMillis);
-
-        mockWorkTime(day, week, fortnight);
-
-        doReturn(3).when(drivingTime.driveIntervals).countDurationInterval(any(Interval.class),
-                any(Duration.class), any(Duration.class));
-
-        Duration available = drivingTime.nextDay();
-
-        assertEquals(Driving.DAILY.getMillis(), available.getMillis());
-    }
-
-    @Test
-    public void nextDay_overtime() {
-        Duration day = new Duration(0);
-        Duration week = new Duration(40 * Driving.hoursToMillis);
-        Duration fortnight = new Duration(80 * Driving.hoursToMillis);
-
-        mockWorkTime(day, week, fortnight);
-
-        doReturn(1).when(drivingTime.driveIntervals).countDurationInterval(any(Interval.class),
-                any(Duration.class), any(Duration.class));
-
-        Duration available = drivingTime.nextDay();
-
-        assertEquals(Driving.DAILY_OVERTIME.getMillis(), available.getMillis());
+        assertNextDay(oneHour, tenHours, threeHours, new Duration(oneHour));
+        assertNextDay(threeHours, tenHours, threeHours, new Duration(threeHours));
+        assertNextDay(eightHours, tenHours, threeHours, new Duration(threeHours));
     }
 
     @Test
     public void nextWeek() {
-        Duration day = new Duration(0);
-        Duration fortnight = new Duration(34 * Driving.hoursToMillis);
+        assertNextWeek(0, 0, new Duration(0));
 
-        mockWorkTime(day, day, fortnight);
+        assertNextWeek(oneHour, eightHours, new Duration(oneHour));
+        assertNextWeek(fiveHours, eightHours, new Duration(fiveHours));
+        assertNextWeek(eightHours, eightHours, new Duration(eightHours));
 
-        Duration available = drivingTime.nextWeek();
-        assertEquals(Driving.WEEKLY.getMillis(), available.getMillis());
-    }
-
-    @Test
-    public void nextFortnight() {
-        Duration day = new Duration(0);
-
-        mockWorkTime(day, day, day);
-
-        Duration available = drivingTime.nextWeek();
-        assertEquals(90.0, available.getStandardHours(), 0);
-    }
-
-    @Test
-    public void nonstop_noOverlap() {
+        assertNextWeek(oneHour, fiveHours, new Duration(oneHour));
+        assertNextWeek(fiveHours, fiveHours, new Duration(fiveHours));
+        assertNextWeek(eightHours, fiveHours, new Duration(fiveHours));
 
     }
 
-    @Test
-    public void nonstop_overlap() {
-        Duration overlap = new Duration(0);
-        overlap = overlap.plus(2 * Driving.hoursToMillis);
-
-        long expected = 2 * Driving.hoursToMillis + 30 * Driving.minutesToMillis;
-
-        doReturn(overlap).when(drivingTime.driveIntervals).overlap(any(Interval.class));
-
-        assertEquals(expected, drivingTime.nonstop().getMillis());
+    private void assertNextDay(long dayMillis, long weekMillis, long fortnightMillis, Duration expected) {
+        mockTime(dayMillis, weekMillis, fortnightMillis);
+        assertEquals(expected, drivingTime.nextDay());
     }
 
-    /**
-     * Do a partial mock of driving time, returning the passed duration when
-     * {@link DrivingTime#lastDay(org.joda.time.DateTime)},
-     * {@link DrivingTime#lastWeek(org.joda.time.DateTime)} or
-     * {@link DrivingTime#lastFortnight(org.joda.time.DateTime)} are called.
-     *
-     * @param day       the mock duration of a last day.
-     * @param week      the mock duration of a last week.
-     * @param fortnight the mock duration of a last fortnight.
-     */
-    private void mockWorkTime(Duration day, Duration week, Duration fortnight) {
-        doReturn(day).when(drivingTime).lastDay(any(DateTime.class));
-        doReturn(week).when(drivingTime).lastWeek(any(DateTime.class));
-        doReturn(fortnight).when(drivingTime).lastFortnight(any(DateTime.class));
+    private void assertNextWeek(long weekMillis, long fortnightMillis, Duration expected) {
+        mockTime(0, weekMillis, fortnightMillis);
+        assertEquals(expected, drivingTime.nextWeek());
+    }
+
+    private void mockTime(long dayMillis, long weekMillis, long fortnightMillis) {
+        Duration dayDuration = new Duration(dayMillis);
+        Duration weekDuration = new Duration(weekMillis);
+        Duration fortnightDuration = new Duration(fortnightMillis);
+
+        when(day.getAvailable()).thenReturn(dayDuration);
+        when(week.getAvailable()).thenReturn(weekDuration);
+        when(fortnight.getAvailable()).thenReturn(fortnightDuration);
     }
 }

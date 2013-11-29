@@ -1,12 +1,12 @@
 package io.github.axxiss.drivingtime;
 
+import io.github.axxiss.drivingtime.rules.Day;
+import io.github.axxiss.drivingtime.rules.Fortnight;
+import io.github.axxiss.drivingtime.rules.Week;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
 
-import java.util.Date;
-
-import static io.github.axxiss.drivingtime.Utils.available;
 import static io.github.axxiss.drivingtime.Utils.minDuration;
 
 /**
@@ -22,42 +22,18 @@ public class DrivingTime {
     protected IntervalList driveIntervals;
 
 
+    private Day day;
+    private Week week;
+    private Fortnight fortnight;
+
+
     /**
      * Creates a new driving time instance.
-     *
-     * @param history driving history, <b><MUST/b> be sorted from oldest to newest.
      */
-    public DrivingTime(Date[] history) {
-        final int instants = history.length;
-        driveIntervals = new IntervalList(history);
-    }
-
-
-    /**
-     * Return the {@link Duration} worked over the last 24 hours.
-     *
-     * @return
-     */
-    public Duration lastDay(DateTime when) {
-        return driveIntervals.overlap(new Interval(when.minusDays(1), when));
-    }
-
-    /**
-     * Return the {@link Duration} worked over the last 7 days.
-     *
-     * @return
-     */
-    public Duration lastWeek(DateTime when) {
-        return driveIntervals.overlap(new Interval(when.minusWeeks(1), when));
-    }
-
-    /**
-     * Return the {@link Duration} worked over the last 15 days.
-     *
-     * @return
-     */
-    public Duration lastFortnight(DateTime when) {
-        return driveIntervals.overlap(new Interval(when.minusWeeks(2), when));
+    public DrivingTime(Day day, Week week, Fortnight fortnight) {
+        this.day = day;
+        this.week = week;
+        this.fortnight = fortnight;
     }
 
     /**
@@ -66,31 +42,8 @@ public class DrivingTime {
      * @return
      */
     public Duration nextDay() {
-        DateTime when = DateTime.now().plusDays(1);
-
-        Duration aDay = new Duration(24 * Driving.hoursToMillis);
-
-        Interval outer = new Interval(when.minusWeeks(1), when);
-
-        int overtime = driveIntervals.countDurationInterval(outer, aDay, Driving.DAILY);
-
-        Duration dayMax;
-
-        if (overtime < 2) {
-            dayMax = Driving.DAILY_OVERTIME;
-        } else {
-            dayMax = Driving.DAILY;
-        }
-
-
-        Duration day = available(dayMax, lastDay(when));
-        Duration week = available(Driving.WEEKLY, lastWeek(when));
-        Duration fortnight = available(Driving.FORTNIGHTLY, lastFortnight(when));
-
-        Duration min = minDuration(day, dayMax);
-        min = minDuration(week, min);
-        min = minDuration(fortnight, min);
-
+        Duration min = minDuration(day.getAvailable(), week.getAvailable());
+        min = minDuration(fortnight.getAvailable(), min);
         return min;
     }
 
@@ -100,12 +53,7 @@ public class DrivingTime {
      * @return
      */
     public Duration nextWeek() {
-        DateTime when = DateTime.now().plusWeeks(1);
-
-        Duration fortnight = available(Driving.FORTNIGHTLY, lastFortnight(when));
-        Duration min = minDuration(fortnight, Driving.FORTNIGHTLY);
-
-        return min;
+        return minDuration(fortnight.getAvailable(), week.getAvailable());
     }
 
     /**

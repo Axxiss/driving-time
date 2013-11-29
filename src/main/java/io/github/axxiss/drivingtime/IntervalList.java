@@ -26,7 +26,6 @@ public class IntervalList extends ArrayList<Interval> {
         for (int i = 0; i < size(); i += 2) {
             add(new Interval(intervals[i].getTime(), intervals[i + 1].getTime()));
         }
-
     }
 
     /**

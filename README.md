@@ -1,6 +1,8 @@
 Driving Time and Rest Periods
 =============================
 
+Status: [![Build Status](https://travis-ci.org/Axxiss/driving-time.png?branch=master)](https://travis-ci.org/Axxiss/driving-time)
+
 Driving time and rest periods according to [Regulation (EC) 561/2006][1]
 
 These rules establish that:
