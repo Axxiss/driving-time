@@ -17,6 +17,11 @@ public class Driving {
      */
     public static final Duration DAILY = new Duration(9 * hoursToMillis);
 
+    /**
+     * Allowed overtime.
+     */
+    public static final Duration DAILY_OVERTIME = new Duration(10 * hoursToMillis);
+
 
     /**
      * Maximum nonstop driving time, 4,5 hours

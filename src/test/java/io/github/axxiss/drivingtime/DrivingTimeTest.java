@@ -47,17 +47,35 @@ public class DrivingTimeTest {
     }
 
     @Test
-    public void nextDay() {
-
+    public void nextDay_normal() {
         Duration day = new Duration(0);
         Duration week = new Duration(40 * Driving.hoursToMillis);
         Duration fortnight = new Duration(80 * Driving.hoursToMillis);
 
         mockWorkTime(day, week, fortnight);
 
+        doReturn(3).when(drivingTime.driveIntervals).countDurationInterval(any(Interval.class),
+                any(Duration.class), any(Duration.class));
+
         Duration available = drivingTime.nextDay();
 
         assertEquals(Driving.DAILY.getMillis(), available.getMillis());
+    }
+
+    @Test
+    public void nextDay_overtime() {
+        Duration day = new Duration(0);
+        Duration week = new Duration(40 * Driving.hoursToMillis);
+        Duration fortnight = new Duration(80 * Driving.hoursToMillis);
+
+        mockWorkTime(day, week, fortnight);
+
+        doReturn(1).when(drivingTime.driveIntervals).countDurationInterval(any(Interval.class),
+                any(Duration.class), any(Duration.class));
+
+        Duration available = drivingTime.nextDay();
+
+        assertEquals(Driving.DAILY_OVERTIME.getMillis(), available.getMillis());
     }
 
     @Test
@@ -83,16 +101,19 @@ public class DrivingTimeTest {
 
     @Test
     public void nonstop_noOverlap() {
-        doReturn(-1).when(drivingTime.driveIntervals).overlapStart(any(Interval.class));
 
-        assertEquals(Driving.NONSTOP.getMillis(), drivingTime.nonstop().getMillis());
     }
 
     @Test
     public void nonstop_overlap() {
-        doReturn(10).when(drivingTime.driveIntervals).overlapStart(any(Interval.class));
+        Duration overlap = new Duration(0);
+        overlap = overlap.plus(2 * Driving.hoursToMillis);
 
-        assertEquals(Driving.NONSTOP.getMillis(), drivingTime.nonstop().getMillis());
+        long expected = 2 * Driving.hoursToMillis + 30 * Driving.minutesToMillis;
+
+        doReturn(overlap).when(drivingTime.driveIntervals).overlap(any(Interval.class));
+
+        assertEquals(expected, drivingTime.nonstop().getMillis());
     }
 
     /**

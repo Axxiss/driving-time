@@ -1,5 +1,7 @@
 package io.github.axxiss.drivingtime;
 
+import org.joda.time.Duration;
+
 /**
  * Created with IntelliJ IDEA.
  * User: alexis
@@ -8,6 +10,5 @@ package io.github.axxiss.drivingtime;
  * To change this template use File | Settings | File Templates.
  */
 public class Rest {
-
-
+    public static final Duration NONSTOP = new Duration(45 * Driving.minutesToMillis);
 }

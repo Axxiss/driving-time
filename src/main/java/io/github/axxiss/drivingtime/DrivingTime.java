@@ -68,11 +68,26 @@ public class DrivingTime {
     public Duration nextDay() {
         DateTime when = DateTime.now().plusDays(1);
 
-        Duration day = available(Driving.DAILY, lastDay(when));
+        Duration aDay = new Duration(24 * Driving.hoursToMillis);
+
+        Interval outer = new Interval(when.minusWeeks(1), when);
+
+        int overtime = driveIntervals.countDurationInterval(outer, aDay, Driving.DAILY);
+
+        Duration dayMax;
+
+        if (overtime < 2) {
+            dayMax = Driving.DAILY_OVERTIME;
+        } else {
+            dayMax = Driving.DAILY;
+        }
+
+
+        Duration day = available(dayMax, lastDay(when));
         Duration week = available(Driving.WEEKLY, lastWeek(when));
         Duration fortnight = available(Driving.FORTNIGHTLY, lastFortnight(when));
 
-        Duration min = minDuration(day, Driving.DAILY);
+        Duration min = minDuration(day, dayMax);
         min = minDuration(week, min);
         min = minDuration(fortnight, min);
 
@@ -113,17 +128,23 @@ public class DrivingTime {
 
         Interval interval = new Interval(start, now);
 
-        int index = driveIntervals.overlapStart(interval);
+        Duration overlap = driveIntervals.overlap(interval);
 
-        if (index == -1) {
-            return Driving.NONSTOP;
-        }
-
-
-        int gap = driveIntervals.findGap(index, Driving.NONSTOP);
+        return Driving.NONSTOP.minus(overlap);
+    }
 
 
-        return Driving.FORTNIGHTLY;
+    /**
+     * Check for normal non-stop.
+     */
+    private void nonStopNormal() {
+
+    }
+
+    /**
+     * Check for split non stop.
+     */
+    private void nonStopSplit() {
 
     }
 

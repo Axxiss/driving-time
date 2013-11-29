@@ -11,6 +11,11 @@ import java.util.Date;
  */
 public class IntervalList extends ArrayList<Interval> {
 
+    /**
+     * Creates a new list with the given dates.
+     *
+     * @param intervals size must be odd.
+     */
     public IntervalList(Date[] intervals) {
         super(intervals.length);
 
@@ -33,6 +38,7 @@ public class IntervalList extends ArrayList<Interval> {
     public Duration overlap(Interval interval) {
         Duration amount = new Duration(0);
 
+        //To handle large amount of data it is best to use binary search.
         for (Interval i : this) {
             Interval match = interval.overlap(i);
 
@@ -45,38 +51,79 @@ public class IntervalList extends ArrayList<Interval> {
     }
 
     /**
-     * Given an {@link Interval} finds the first overlapping interval.
+     * Count how much time is present inside {@code outer}
      *
-     * @param interval the interval to search.
-     * @return the index of the overlapping interval.
+     * @param outer
+     * @param next
+     * @param threshold
+     * @return
      */
-    public int overlapStart(Interval interval) {
-        int last = size() - 1;
+    public int countDurationInterval(Interval outer, Duration next, Duration threshold) {
+        int count = 0;
+        int index = overlapStart(outer);
 
-        int i = 0;
-        while (i < last && !get(i).overlaps(interval)) {
-            i++;
+        Interval inner = new Interval(outer.getStartMillis(), outer.getStartMillis() + next.getMillis());
+
+        long duration = next.getMillis();
+        while (index < size() - 1) {
+            long start = inner.getStartMillis() + duration;
+            long end = inner.getEndMillis() + duration;
+
+            inner = new Interval(start, end);
+
+            if (overlap(inner).isLongerThan(threshold)) {
+                count++;
+            }
         }
 
-        if (i > last) {
-            return -1;
-        } else {
-            return i;
-        }
+        return count;
     }
 
-    public int findGap(int start, Duration gap) {
 
-        int i = start;
-
+    /**
+     * Given an interval and a duration, search for a gap equal or greater than the duration inside
+     * the interval.
+     *
+     * @param interval interval to search
+     * @param gap      the minimum gap to find
+     * @return the index of the interval before the gap
+     */
+    public int findGap(int start, Interval interval, Duration gap) {
         boolean found = false;
 
-        while (i < size() - 1 && !found) {
-            Duration currentGap = get(i).gap(get(i + 1)).toDuration();
+        while (start < size() - 2 && !found) {
+            Duration currentGap = get(start).gap(get(start + 1)).toDuration();
 
             if (currentGap.compareTo(gap) >= 0) {
                 found = true;
+            } else {
+                start++;
             }
+        }
+
+        if (!found) {
+            if (start == size() - 1) {
+            }
+        }
+
+        return start;
+    }
+
+    /**
+     * Find the index where {@code interval} starts.
+     *
+     * @param interval
+     * @return the index.
+     */
+    public int overlapStart(Interval interval) {
+        int i = 0;
+
+        while (i < size() - 1 && !get(i).overlaps(interval)) {
+            i++;
+        }
+
+        if (i >= size()) {
+            return -1;
         }
 
         return i;
