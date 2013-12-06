@@ -30,6 +30,10 @@ public abstract class Rule {
 
     protected Interval period;
 
+
+    /**
+     * List of intervals.
+     */
     protected IntervalList intervals;
 
     public Rule(DateTime start, DateTime end, long max, IntervalList intervals) {
@@ -60,6 +64,13 @@ public abstract class Rule {
         return max;
     }
 
+    /**
+     * If current duration is greater than max, zero is returned. Otherwise max minus current is returned.
+     *
+     * @param max
+     * @param current
+     * @return
+     */
     protected Duration safeAvailable(Duration max, Duration current) {
         if (max.isShorterThan(current)) {
             return new Duration(0);

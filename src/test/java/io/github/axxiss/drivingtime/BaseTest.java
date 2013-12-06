@@ -21,4 +21,5 @@ public class BaseTest {
     protected long eightHours = 8 * hoursToMillis;
     protected long nineHours = 9 * hoursToMillis;
     protected long tenHours = 10 * hoursToMillis;
+    protected long twelveHours = 12 * hoursToMillis;
 }

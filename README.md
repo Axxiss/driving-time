@@ -1,7 +1,7 @@
 Driving Time and Rest Periods
 =============================
 
-Status: [![Build Status](https://travis-ci.org/Axxiss/driving-time.png?branch=master)](https://travis-ci.org/Axxiss/driving-time)
+[![Build Status](https://travis-ci.org/Axxiss/driving-time.png?branch=master)](https://travis-ci.org/Axxiss/driving-time)
 
 Driving time and rest periods according to [Regulation (EC) 561/2006][1]
 
@@ -17,6 +17,8 @@ These rules establish that:
 - Breaks of at least 45 minutes (separable into 15 minutes followed by 30 minutes) should be taken after 4 ½ hours at the latest.
 
 
+_Warning!_ this library is not tested with large amount of data, many linear search are used. If you're experiencing
+performance issues open a ticket on the issue tracker.
 
 
 TODO
@@ -33,7 +35,7 @@ Drive
 
 Rest
 ----
-- [ ] normal: 11 hours nonstop
+- [x] normal: 11 hours nonstop
 - [ ] split: 3 hours + 9 hours nonstop, over a period of 24hours
 - [ ] reduced: 9 hours 3 times a week
 - [ ] weekly: 45 hours

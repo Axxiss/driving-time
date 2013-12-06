@@ -33,7 +33,7 @@ public class DayTest extends BaseTest {
     }
 
     @Test
-    public void available_normal() {
+    public void normal() {
         assertAvailable(2, 0, nineHours);
         assertAvailable(2, oneHour, eightHours);
         assertAvailable(2, fourHours, fiveHours);
@@ -43,7 +43,7 @@ public class DayTest extends BaseTest {
 
 
     @Test
-    public void available_overtime() {
+    public void overtime() {
         assertAvailable(0, 0, tenHours);
         assertAvailable(0, oneHour, nineHours);
         assertAvailable(0, fourHours, sixHours);
@@ -51,7 +51,20 @@ public class DayTest extends BaseTest {
         assertAvailable(0, tenHours, 0);
     }
 
+    @Test
+    public void rest() {
+        assertAvailable(0, 0, 0, sixHours);
+        assertAvailable(2, 0, nineHours, twelveHours);
+        assertAvailable(2, threeHours, sixHours, twelveHours);
+    }
+
     private void assertAvailable(int overtime, long driving, long expected) {
+        assertAvailable(overtime, driving, expected, twelveHours);
+    }
+
+    private void assertAvailable(int overtime, long driving, long expected, long gap) {
+
+        doReturn(new Duration(gap)).when(intervals).findGap(any(Interval.class), any(Duration.class));
         doReturn(new Duration(driving)).when(intervals).overlap(any(Interval.class));
         doReturn(overtime).when(intervals).countDurationInterval(any(Interval.class), any(Duration.class), any(Duration.class));
 

@@ -1,5 +1,6 @@
 package io.github.axxiss.drivingtime;
 
+import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
 
@@ -87,25 +88,31 @@ public class IntervalList extends ArrayList<Interval> {
      * @param gap      the minimum gap to find
      * @return the index of the interval before the gap
      */
-    public int findGap(int start, Interval interval, Duration gap) {
+    public Duration findGap(Interval interval, Duration gap) {
         boolean found = false;
 
+        int start = overlapStart(interval);
+        int index = -1;
+
+        Duration currentGap = new Duration(0);
         while (start < size() - 2 && !found) {
-            Duration currentGap = get(start).gap(get(start + 1)).toDuration();
+            currentGap = get(start).gap(get(start + 1)).toDuration();
 
             if (currentGap.compareTo(gap) >= 0) {
                 found = true;
+                index = -1;
             } else {
                 start++;
             }
         }
 
         if (!found) {
-            if (start == size() - 1) {
-            }
+            DateTime now = DateTime.now();
+            Interval n = new Interval(now, now.plus(1));
+            currentGap = get(start).gap(n).toDuration();
         }
 
-        return start;
+        return currentGap;
     }
 
     /**

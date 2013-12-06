@@ -16,6 +16,8 @@ public class Day extends Rule {
 
     protected final static Duration maxOvertime = new Duration(10 * hoursToMillis);
 
+    protected final static Duration rest = new Duration(11 * hoursToMillis);
+
     public Day(IntervalList intervals, DateTime when) {
         super(when.minusDays(1), when, 9 * hoursToMillis, intervals);
     }
@@ -23,10 +25,16 @@ public class Day extends Rule {
 
     @Override
     protected Duration calcAvailable() {
-        Duration aDay = new Duration(24 * hoursToMillis);
+
+        Duration gap = intervals.findGap(period, rest);
+
+        if (gap.isShorterThan(rest)) {
+            return new Duration(0);
+        }
 
         Interval outer = new Interval(period.getEnd().minusWeeks(1), period.getEnd());
 
+        Duration aDay = new Duration(24 * hoursToMillis);
         int overtime = intervals.countDurationInterval(outer, aDay, max);
 
         Duration dayMax;
@@ -43,4 +51,6 @@ public class Day extends Rule {
             return new Duration(0);
         }
     }
+
+
 }
