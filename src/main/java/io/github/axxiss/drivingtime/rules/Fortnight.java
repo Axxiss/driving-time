@@ -15,10 +15,11 @@ public class Fortnight extends Rule {
 
     public Fortnight(IntervalList intervals, DateTime when) {
         super(when.minusWeeks(2), when, 90 * hoursToMillis, intervals);
+        rest = new Duration(0);
     }
 
     @Override
-    protected Duration calcAvailable() {
+    protected Duration available() {
         return safeAvailable(max, driving);
     }
 }

@@ -3,6 +3,7 @@ package io.github.axxiss.drivingtime.rules;
 import io.github.axxiss.drivingtime.BaseTest;
 import io.github.axxiss.drivingtime.Hours;
 import io.github.axxiss.drivingtime.IntervalList;
+import io.github.axxiss.drivingtime.rules.day.Day;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Interval;

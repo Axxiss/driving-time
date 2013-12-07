@@ -18,7 +18,7 @@ public class Week extends Rule {
     }
 
     @Override
-    protected Duration calcAvailable() {
+    protected Duration available() {
 
 
         return safeAvailable(max, driving);

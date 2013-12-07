@@ -1,5 +1,7 @@
 package io.github.axxiss.drivingtime;
 
+import org.joda.time.Duration;
+
 /**
  * Created by alexis on 12/7/13.
  */
@@ -16,17 +18,18 @@ public enum Hours {
     h9(9),
     h10(10),
     h11(11),
+    h12(12),
     h21(21),
     h24(24),
     h45(45);
 
-    long value;
+    Duration value;
 
     Hours(int h) {
-        value = h * 3600000;
+        value = new Duration(h * 3600000);
     }
 
-    public long getValue() {
+    public Duration getValue() {
         return value;
     }
 }

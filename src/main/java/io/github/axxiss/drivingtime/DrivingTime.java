@@ -1,8 +1,8 @@
 package io.github.axxiss.drivingtime;
 
-import io.github.axxiss.drivingtime.rules.Day;
 import io.github.axxiss.drivingtime.rules.Fortnight;
 import io.github.axxiss.drivingtime.rules.Week;
+import io.github.axxiss.drivingtime.rules.day.Day;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Interval;

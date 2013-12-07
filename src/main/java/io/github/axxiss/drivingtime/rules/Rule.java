@@ -51,7 +51,7 @@ public abstract class Rule {
         period = new Interval(start, end);
         this.intervals = intervals;
         driving = intervals.overlap(period);
-        available = calcAvailable();
+        available = available();
     }
 
     public Duration getDriving() {
@@ -94,7 +94,7 @@ public abstract class Rule {
      *
      * @return
      */
-    protected abstract Duration calcAvailable();
+    protected abstract Duration available();
 
 
     /**
@@ -105,6 +105,10 @@ public abstract class Rule {
     protected Duration calcRest() {
 
         Duration gap = intervals.findGap(period, rest);
+
+        if (gap == null) {
+            gap = intervals.lastGap();
+        }
 
         if (gap.isShorterThan(rest)) {
             return rest.minus(gap);

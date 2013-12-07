@@ -20,11 +20,11 @@ public class IntervalList extends ArrayList<Interval> {
     public IntervalList(Date[] intervals) {
         super(intervals.length);
 
-        if (size() % 2 != 0) {
-            throw new IllegalArgumentException("History parameter must be an odd number.");
+        if (intervals.length % 2 != 0) {
+            throw new IllegalArgumentException("Intervals parameter must be an odd number.");
         }
 
-        for (int i = 0; i < size(); i += 2) {
+        for (int i = 0; i < intervals.length; i += 2) {
             add(new Interval(intervals[i].getTime(), intervals[i + 1].getTime()));
         }
     }
@@ -92,27 +92,38 @@ public class IntervalList extends ArrayList<Interval> {
         boolean found = false;
 
         int start = overlapStart(interval);
-        int index = -1;
 
-        Duration currentGap = new Duration(0);
+        Duration currentGap = null;
         while (start < size() - 2 && !found) {
             currentGap = get(start).gap(get(start + 1)).toDuration();
 
             if (currentGap.compareTo(gap) >= 0) {
                 found = true;
-                index = -1;
             } else {
                 start++;
             }
         }
 
         if (!found) {
-            DateTime now = DateTime.now();
-            Interval n = new Interval(now, now.plus(1));
-            currentGap = get(start).gap(n).toDuration();
+            return null;
         }
 
         return currentGap;
+    }
+
+    /**
+     * Given two intervals, the first one defines the outer limits to search, and the second
+     * one the inner limits. Inner interval fits several times inside the outer limit.
+     *
+     * @param outer
+     * @param inner
+     * @return
+     */
+    public int countGaps(Interval outer, Duration inner, Duration min, Duration max) {
+        int amount = 0;
+
+
+        return amount;
     }
 
     /**
@@ -133,5 +144,11 @@ public class IntervalList extends ArrayList<Interval> {
         }
 
         return i;
+    }
+
+    public Duration lastGap() {
+        DateTime last = get(size() - 1).getEnd();
+        Interval gap = new Interval(last, DateTime.now());
+        return gap.toDuration();
     }
 }
