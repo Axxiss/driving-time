@@ -6,32 +6,30 @@ import org.joda.time.Duration;
 import org.joda.time.Interval;
 
 /**
- * Created with IntelliJ IDEA.
- * User: alexis
- * Date: 11/29/13
- * Time: 10:56 AM
- * To change this template use File | Settings | File Templates.
+ * Definition of the rules that applies in a day.
  */
 public class Day extends Rule {
 
+    /**
+     * Maximum allowed overtime to drive no more than two days a week.
+     */
     protected final static Duration maxOvertime = new Duration(10 * hoursToMillis);
 
-    protected final static Duration rest = new Duration(11 * hoursToMillis);
-
+    /**
+     * @param intervals
+     * @param when
+     */
     public Day(IntervalList intervals, DateTime when) {
         super(when.minusDays(1), when, 9 * hoursToMillis, intervals);
+        rest = new Duration(11 * hoursToMillis);
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Duration calcAvailable() {
-
-        Duration gap = intervals.findGap(period, rest);
-
-        if (gap.isShorterThan(rest)) {
-            return new Duration(0);
-        }
-
         Interval outer = new Interval(period.getEnd().minusWeeks(1), period.getEnd());
 
         Duration aDay = new Duration(24 * hoursToMillis);
@@ -51,6 +49,4 @@ public class Day extends Rule {
             return new Duration(0);
         }
     }
-
-
 }

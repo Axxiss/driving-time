@@ -14,10 +14,13 @@ import org.joda.time.Duration;
 public class Week extends Rule {
     public Week(IntervalList intervals, DateTime when) {
         super(when.minusWeeks(1), when, 56 * hoursToMillis, intervals);
+        rest = new Duration(45 * hoursToMillis);
     }
 
     @Override
     protected Duration calcAvailable() {
+
+
         return safeAvailable(max, driving);
     }
 }

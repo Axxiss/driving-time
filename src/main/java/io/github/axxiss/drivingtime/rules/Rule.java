@@ -25,10 +25,20 @@ public abstract class Rule {
 
     /**
      * Maximum amount of time to drive on this period.
+     * <p/>
+     * This value MUST be set by the subclass.
      */
     protected Duration max;
 
     protected Interval period;
+
+
+    /**
+     * The normal amount of time that the driver need to rest.
+     * <p/>
+     * This value MUST be set by the subclass.
+     */
+    protected Duration rest;
 
 
     /**
@@ -38,7 +48,7 @@ public abstract class Rule {
 
     public Rule(DateTime start, DateTime end, long max, IntervalList intervals) {
         this.max = new Duration(max);
-        this.period = new Interval(start, end);
+        period = new Interval(start, end);
         this.intervals = intervals;
         driving = intervals.overlap(period);
         available = calcAvailable();
@@ -80,9 +90,26 @@ public abstract class Rule {
     }
 
     /**
-     * Allowed time to drive.
+     * Calculates the allowed time to drive, without considering rest periods.
      *
      * @return
      */
     protected abstract Duration calcAvailable();
+
+
+    /**
+     * Calculates the duration that the driver needs to rest in the current rule.
+     *
+     * @return rest duration.
+     */
+    protected Duration calcRest() {
+
+        Duration gap = intervals.findGap(period, rest);
+
+        if (gap.isShorterThan(rest)) {
+            return rest.minus(gap);
+        } else {
+            return new Duration(0);
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package io.github.axxiss.drivingtime.rules;
 
 import io.github.axxiss.drivingtime.BaseTest;
+import io.github.axxiss.drivingtime.Hours;
 import io.github.axxiss.drivingtime.IntervalList;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -12,16 +13,10 @@ import org.junit.runners.JUnit4;
 
 import java.util.Date;
 
+import static io.github.axxiss.drivingtime.Hours.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-/**
- * Created with IntelliJ IDEA.
- * User: alexis
- * Date: 11/29/13
- * Time: 12:04 PM
- * To change this template use File | Settings | File Templates.
- */
 @RunWith(JUnit4.class)
 public class DayTest extends BaseTest {
 
@@ -34,41 +29,48 @@ public class DayTest extends BaseTest {
 
     @Test
     public void normal() {
-        assertAvailable(2, 0, nineHours);
-        assertAvailable(2, oneHour, eightHours);
-        assertAvailable(2, fourHours, fiveHours);
-        assertAvailable(2, eightHours, oneHour);
-        assertAvailable(2, tenHours, 0);
+        assertAvailable(2, h0, h9);
+        assertAvailable(2, h1, h8);
+        assertAvailable(2, h4, h5);
+        assertAvailable(2, h8, h1);
+        assertAvailable(2, h10, h0);
     }
 
 
     @Test
     public void overtime() {
-        assertAvailable(0, 0, tenHours);
-        assertAvailable(0, oneHour, nineHours);
-        assertAvailable(0, fourHours, sixHours);
-        assertAvailable(0, nineHours, oneHour);
-        assertAvailable(0, tenHours, 0);
+        assertAvailable(0, h0, h10);
+        assertAvailable(0, h1, h9);
+        assertAvailable(0, h4, h6);
+        assertAvailable(0, h9, h1);
+        assertAvailable(0, h10, h0);
     }
 
     @Test
     public void rest() {
-        assertAvailable(0, 0, 0, sixHours);
-        assertAvailable(2, 0, nineHours, twelveHours);
-        assertAvailable(2, threeHours, sixHours, twelveHours);
+        assertRest(h0, h11);
+        assertRest(h5, h6);
+        assertRest(h11, h0);
     }
 
-    private void assertAvailable(int overtime, long driving, long expected) {
-        assertAvailable(overtime, driving, expected, twelveHours);
+
+    private void assertAvailable(int overtime, Hours driving, Hours expected) {
+        assertAvailable(overtime, driving, expected, h11);
     }
 
-    private void assertAvailable(int overtime, long driving, long expected, long gap) {
+    private void assertAvailable(int overtime, Hours driving, Hours expected, Hours gap) {
 
-        doReturn(new Duration(gap)).when(intervals).findGap(any(Interval.class), any(Duration.class));
-        doReturn(new Duration(driving)).when(intervals).overlap(any(Interval.class));
+        doReturn(new Duration(gap.getValue())).when(intervals).findGap(any(Interval.class), any(Duration.class));
+        doReturn(new Duration(driving.getValue())).when(intervals).overlap(any(Interval.class));
         doReturn(overtime).when(intervals).countDurationInterval(any(Interval.class), any(Duration.class), any(Duration.class));
 
         Day day = new Day(intervals, DateTime.now());
-        assertEquals(new Duration(expected), day.getAvailable());
+        assertEquals(new Duration(expected.getValue()), day.getAvailable());
+    }
+
+    private void assertRest(Hours expected, Hours rest) {
+        doReturn(new Duration(rest.getValue())).when(intervals).findGap(any(Interval.class), any(Duration.class));
+        Day day = new Day(intervals, DateTime.now());
+        assertEquals(new Duration(expected.getValue()), day.calcRest());
     }
 }
