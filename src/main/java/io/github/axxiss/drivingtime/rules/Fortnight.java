@@ -1,6 +1,7 @@
 package io.github.axxiss.drivingtime.rules;
 
 import io.github.axxiss.drivingtime.IntervalList;
+import io.github.axxiss.drivingtime.Utils;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
@@ -20,6 +21,6 @@ public class Fortnight extends Rule {
 
     @Override
     protected Duration available() {
-        return safeAvailable(max, driving);
+        return Utils.safeMinus(max, driving);
     }
 }

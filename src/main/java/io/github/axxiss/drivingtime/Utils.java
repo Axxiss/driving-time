@@ -41,4 +41,20 @@ public class Utils {
             return b;
         }
     }
+
+
+    /**
+     * If current duration is greater than max, zero is returned. Otherwise max minus current is returned.
+     *
+     * @param max
+     * @param current
+     * @return
+     */
+    public static Duration safeMinus(Duration max, Duration current) {
+        if (max.isShorterThan(current)) {
+            return new Duration(0);
+        } else {
+            return max.minus(current);
+        }
+    }
 }

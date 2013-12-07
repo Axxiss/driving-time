@@ -74,20 +74,6 @@ public abstract class Rule {
         return max;
     }
 
-    /**
-     * If current duration is greater than max, zero is returned. Otherwise max minus current is returned.
-     *
-     * @param max
-     * @param current
-     * @return
-     */
-    protected Duration safeAvailable(Duration max, Duration current) {
-        if (max.isShorterThan(current)) {
-            return new Duration(0);
-        } else {
-            return max.minus(current);
-        }
-    }
 
     /**
      * Calculates the allowed time to drive, without considering rest periods.

@@ -118,11 +118,11 @@ public class Day extends Rule {
             if (restShort == null) {
                 return null;
             } else {
-                return Rest.SPLIT_LONG.getValue().minus(intervals.lastGap());
+                return Utils.safeMinus(Rest.SPLIT_LONG.getValue(), intervals.lastGap());
             }
         } else {
             if (restShort == null) {
-                return Rest.SPLIT_SHORT.getValue().minus(intervals.lastGap());
+                return Utils.safeMinus(Rest.SPLIT_SHORT.getValue(), intervals.lastGap());
             } else {
                 return new Duration(0);
             }

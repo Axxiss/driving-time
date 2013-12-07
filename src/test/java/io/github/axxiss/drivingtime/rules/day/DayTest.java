@@ -86,17 +86,11 @@ public class DayTest extends BaseTest {
         assertRestSplit(h0, h9, null, h3);
         assertRestSplit(h0, h9, null, h6);
         assertRestSplit(h0, h9, null, h12);
-
-        assertRestSplit(h9, h3, null, h0);
-        assertRestSplit(h8, h3, null, h1);
-        assertRestSplit(h6, h3, null, h3);
-        assertRestSplit(h3, h3, null, h6);
-        assertRestSplit(h0, h3, null, h12);
     }
 
     @Test
     public void restSplit_notFound() {
-
+        assertRestSplit(h0, h9, null, h6);
     }
 
     private void assertAvailable(int overtime, Hours driving, Hours expected) {
@@ -145,12 +139,14 @@ public class DayTest extends BaseTest {
         }
 
 
-        doReturn(gap1).when(intervals).findGap(any(Interval.class), any(Duration.class));
-        doReturn(gap2).when(intervals).findGap(any(Interval.class), any(Duration.class));
+        doReturn(gap1)
+                .doReturn(gap2)
+                .when(intervals).findGap(any(Interval.class), any(Duration.class));
+//        doReturn(gap2).when(intervals).findGap(any(Interval.class), any(Duration.class));
 
         doReturn(last.getValue()).when(intervals).lastGap();
 
         Day day = new Day(intervals, DateTime.now());
-        assertEquals(new Duration(expected.getValue()), day.calcRest());
+        assertEquals(new Duration(expected.getValue()), day.restSplit());
     }
 }
