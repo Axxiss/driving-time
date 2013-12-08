@@ -61,10 +61,31 @@ public class DayTest extends BaseTest {
         assertRestNormal(h0, null, h12);
     }
 
+
     @Test
     public void restNormal_reduced() {
-//        assertRestReduced(h0, 0, h10, h3);
+        assertRestReduced(h0, 0, h10, h3);
+        assertRestReduced(h0, 1, h10, h3);
+        assertRestReduced(h0, 2, h10, h3);
 
+        assertRestReduced(h9, 0, null, h0);
+        assertRestReduced(h9, 1, null, h0);
+        assertRestReduced(h9, 2, null, h0);
+
+        assertRestReduced(h8, 0, null, h1);
+        assertRestReduced(h6, 1, null, h3);
+        assertRestReduced(h1, 2, null, h8);
+    }
+
+    @Test
+    public void restNormal_reduced_maxReached() {
+        assertRestReduced(null, 3, h10, h3);
+        assertRestReduced(null, 3, null, h3);
+        assertRestReduced(null, 3, null, h3);
+
+        assertRestReduced(null, 6, h10, h3);
+        assertRestReduced(null, 6, null, h3);
+        assertRestReduced(null, 6, null, h3);
     }
 
     @Test
@@ -169,7 +190,27 @@ public class DayTest extends BaseTest {
         assertEquals(expectedDuration, day.restSplit());
     }
 
-    private void assertRestReduced(Hours expected, int reduced) {
 
+    /**
+     * Assert a reduced rest period.
+     *
+     * @param expected expected duration
+     * @param reduced  amount of reduced rest done in the last 6 days
+     */
+    private void assertRestReduced(Hours expected, int reduced, Hours rest, Hours last) {
+        Duration expectedDuration = expected == null ? null : expected.getValue();
+        Duration gap = rest == null ? null : rest.getValue();
+
+
+        doReturn(reduced).when(intervals).countGaps(any(Interval.class), any(Duration.class), any(Duration.class), any(Duration.class));
+
+        doReturn(gap).when(intervals).findGap(any(Interval.class), any(Duration.class));
+
+        doReturn(last.getValue()).when(intervals).lastGap();
+
+
+        Day day = new Day(intervals, DateTime.now());
+        assertEquals(expectedDuration, day.restReduced());
     }
+
 }

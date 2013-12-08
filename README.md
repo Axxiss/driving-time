@@ -3,6 +3,8 @@ Driving Time and Rest Periods
 
 [![Build Status](https://travis-ci.org/Axxiss/driving-time.png?branch=master)](https://travis-ci.org/Axxiss/driving-time)
 
+[![Coverage Status](https://coveralls.io/repos/Axxiss/driving-time/badge.png?branch=master)](https://coveralls.io/r/Axxiss/driving-time?branch=master)
+
 Driving time and rest periods according to [Regulation (EC) 561/2006][1]
 
 These rules establish that:
@@ -37,7 +39,7 @@ Rest
 ----
 - [x] normal: 11 hours nonstop
 - [x] split: 3 hours + 9 hours nonstop, over a period of 24hours
-- [ ] reduced: 9 hours 3 times a week
+- [x] reduced: 9 hours 3 times a week
 - [x] weekly: 45 hours
 - [ ] reduced: 24 hours minimum, recover reduction before the 3rd week.
 
