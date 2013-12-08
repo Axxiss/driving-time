@@ -28,7 +28,8 @@ public class Week extends Rule {
      * @return
      */
     protected Duration restReduced() {
-        if (isLastRestReduced()) {
+        Duration gap = lastWeekRest();
+        if (gap.isShorterThan(Rest.NORMAL.getValue())) {
             return null;
         }
 
@@ -40,13 +41,13 @@ public class Week extends Rule {
      *
      * @return true if last week rest was reduced
      */
-    protected boolean isLastRestReduced() {
+    protected Duration lastWeekRest() {
         DateTime start = period.getStart().minusWeeks(1);
         DateTime end = period.getEnd().minusWeeks(1);
 
         Interval lastWeek = new Interval(start, end);
 
-        return intervals.findGap(lastWeek, Rest.NORMAL.getValue()) == null;
+        return intervals.findGap(lastWeek, Rest.REDUCED.getValue());
     }
 
 
@@ -54,7 +55,11 @@ public class Week extends Rule {
      * @return
      */
     protected Duration restRecovery() {
-//        if (isLastRestReduced())
+        Duration gap = lastWeekRest();
+        if (gap.isShorterThan(Rest.NORMAL.getValue())) {
+
+        }
+
         return null;
     }
 }

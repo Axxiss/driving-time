@@ -2,21 +2,14 @@ package io.github.axxiss.drivingtime.rules.week;
 
 import io.github.axxiss.drivingtime.BaseTest;
 import io.github.axxiss.drivingtime.Hours;
-import io.github.axxiss.drivingtime.IntervalList;
-import io.github.axxiss.drivingtime.rules.day.Day;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
-import org.joda.time.Interval;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.util.Date;
-
 import static io.github.axxiss.drivingtime.Hours.*;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
@@ -30,20 +23,10 @@ import static org.mockito.Mockito.spy;
 @RunWith(JUnit4.class)
 public class WeekTest extends BaseTest {
 
-
-    IntervalList intervals;
-
-    Week week;
-
-    @Before
-    public void setUp() throws Exception {
-        intervals = spy(new IntervalList(new Date[0]));
-    }
-
     @Test
     public void calcAvailable() {
-        mockData(0);
-        week = new Week(intervals, DateTime.now());
+        mockOverlap(h0);
+        Week week = new Week(intervals, DateTime.now());
         assertEquals(week.getMax(), week.getAvailable());
     }
 
@@ -65,21 +48,21 @@ public class WeekTest extends BaseTest {
 
     @Test
     public void restReduced_lastWeekReduced() {
-        assertRestReduced(null, null, h0);
-        assertRestReduced(null, null, h12);
-        assertRestReduced(null, null, h21);
-        assertRestReduced(null, null, h24);
+        assertRestReduced(hNull, h30, h0);
+        assertRestReduced(hNull, h30, h12);
+        assertRestReduced(hNull, h30, h21);
+        assertRestReduced(hNull, h30, h24);
     }
 
     @Test
-    public void isLastRestReduced() {
+    public void lastWeekRest() {
         Week week = new Week(intervals, DateTime.now());
 
-        doReturn(null).when(intervals).findGap(any(Interval.class), any(Duration.class));
-        assertTrue(week.isLastRestReduced());
+        mockFindGap(h30);
+        assertEquals(h30.getValue(), week.lastWeekRest());
 
-        doReturn(h45.getValue()).when(intervals).findGap(any(Interval.class), any(Duration.class));
-        assertFalse(week.isLastRestReduced());
+        mockFindGap(h45);
+        assertEquals(h45.getValue(), week.lastWeekRest());
     }
 
     @Test
@@ -95,52 +78,30 @@ public class WeekTest extends BaseTest {
 
     @Test
     public void restRecovery_uncompleted() {
-        assertRestRecovery(h18, h24, null, h3);
-        assertRestRecovery(h1, h24, null, h20);
-        assertRestRecovery(h1, h30, null, h10);
-    }
-
-
-    private void mockData(long overlap) {
-        Duration d = new Duration(overlap);
-        doReturn(d).when(intervals).overlap(any(Interval.class));
-    }
-
-    private void assertAvailable(long driving, long expected, long gap) {
-
-        doReturn(new Duration(gap)).when(intervals).findGap(any(Interval.class), any(Duration.class));
-        doReturn(new Duration(driving)).when(intervals).overlap(any(Interval.class));
-
-        Day day = new Day(intervals, DateTime.now());
-        assertEquals(new Duration(expected), day.getAvailable());
+        assertRestRecovery(h18, h24, hNull, h3);
+        assertRestRecovery(h1, h24, hNull, h20);
+        assertRestRecovery(h1, h30, hNull, h10);
     }
 
     private void assertRest(Hours expected, Hours rest) {
-        doReturn(new Duration(rest.getValue())).when(intervals).findGap(any(Interval.class), any(Duration.class));
+        mockFindGap(rest);
+
         Week week = new Week(intervals, DateTime.now());
         assertEquals(new Duration(expected.getValue()), week.calcRest());
     }
 
     private void assertRestReduced(Hours expected, Hours rest, Hours last) {
-
-        Duration gap = rest == null ? null : rest.getValue();
-        Duration expectedDuration = expected == null ? null : expected.getValue();
-
-
-        doReturn(gap).when(intervals).findGap(any(Interval.class), any(Duration.class));
-        doReturn(last.getValue()).when(intervals).lastGap();
-
+        mockLastGap(last);
 
         Week week = spy(new Week(intervals, DateTime.now()));
-        assertEquals(expectedDuration, week.restReduced());
+
+        doReturn(rest.getValue()).when(week).lastWeekRest();
+
+        assertEquals(expected.getValue(), week.restReduced());
     }
 
     private void assertRestRecovery(Hours expected, Hours first, Hours second, Hours last) {
-        Duration gap = first == null ? null : first.getValue();
-        Duration expectedDuration = expected == null ? null : expected.getValue();
-
-
         Week week = spy(new Week(intervals, DateTime.now()));
-        assertEquals(expectedDuration, week.restRecovery());
+        assertEquals(expected.getValue(), week.restRecovery());
     }
 }
