@@ -58,7 +58,7 @@ public class Day extends Rule {
      *
      * @return Pending rest time.
      */
-    protected Duration calcRest() {
+    public Duration calcRest() {
         Duration normal = super.calcRest();
         Duration split = restSplit();
         Duration reduced = restReduced();
