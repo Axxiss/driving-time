@@ -56,8 +56,19 @@ public class WeekTest extends BaseTest {
     }
 
     @Test
-    public void restReduced_notFound() {
+    public void restReduced_lastWeekNormal() {
         assertRestReduced(h24, h45, h0);
+        assertRestReduced(h12, h45, h12);
+        assertRestReduced(h3, h45, h21);
+        assertRestReduced(h0, h45, h24);
+    }
+
+    @Test
+    public void restReduced_lastWeekReduced() {
+        assertRestReduced(null, null, h0);
+        assertRestReduced(null, null, h12);
+        assertRestReduced(null, null, h21);
+        assertRestReduced(null, null, h24);
     }
 
     @Test
@@ -95,12 +106,14 @@ public class WeekTest extends BaseTest {
     private void assertRestReduced(Hours expected, Hours rest, Hours last) {
 
         Duration gap = rest == null ? null : rest.getValue();
+        Duration expectedDuration = expected == null ? null : expected.getValue();
 
 
         doReturn(gap).when(intervals).findGap(any(Interval.class), any(Duration.class));
+        doReturn(last.getValue()).when(intervals).lastGap();
 
 
         Week week = spy(new Week(intervals, DateTime.now()));
-        assertEquals(expected.getValue(), week.restReduced());
+        assertEquals(expectedDuration, week.restReduced());
     }
 }
