@@ -6,6 +6,7 @@ import org.joda.time.Duration;
  * Created by alexis on 12/7/13.
  */
 public enum Hours {
+    hNull(-1),
     h0(0),
     h1(1),
     h2(2),
@@ -30,7 +31,11 @@ public enum Hours {
     Duration value;
 
     Hours(int h) {
-        value = new Duration(h * 3600000);
+        if (h < 0) {
+            value = null;
+        } else {
+            value = new Duration(h * 3600000);
+        }
     }
 
     public Duration getValue() {
