@@ -36,7 +36,7 @@ Drive
 Rest
 ----
 - [x] normal: 11 hours nonstop
-- [ ] split: 3 hours + 9 hours nonstop, over a period of 24hours
+- [x] split: 3 hours + 9 hours nonstop, over a period of 24hours
 - [ ] reduced: 9 hours 3 times a week
 - [x] weekly: 45 hours
 - [ ] reduced: 24 hours minimum, recover reduction before the 3rd week.

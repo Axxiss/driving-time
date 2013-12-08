@@ -63,6 +63,7 @@ public class DayTest extends BaseTest {
 
     @Test
     public void restNormal_reduced() {
+//        assertRestReduced(h0, 0, h10, h3);
 
     }
 
@@ -90,7 +91,7 @@ public class DayTest extends BaseTest {
 
     @Test
     public void restSplit_notFound() {
-        assertRestSplit(h0, h9, null, h6);
+        assertRestSplit(null, null, null, h6);
     }
 
     private void assertAvailable(int overtime, Hours driving, Hours expected) {
@@ -107,6 +108,13 @@ public class DayTest extends BaseTest {
         assertEquals(new Duration(expected.getValue()), day.getAvailable());
     }
 
+    /**
+     * Assert normal rest
+     *
+     * @param expected Expected pending rest
+     * @param rest     Gap found
+     * @param last     gap from the las activity.
+     */
     private void assertRestNormal(Hours expected, Hours rest, Hours last) {
         Duration gap;
         if (rest == null) {
@@ -126,6 +134,12 @@ public class DayTest extends BaseTest {
         assertEquals(new Duration(expected.getValue()), day.calcRest());
     }
 
+    /**
+     * @param expected
+     * @param rest1
+     * @param rest2
+     * @param last
+     */
     private void assertRestSplit(Hours expected, Hours rest1, Hours rest2, Hours last) {
         Duration gap1 = null;
         Duration gap2 = null;
@@ -138,15 +152,24 @@ public class DayTest extends BaseTest {
             gap2 = rest2.getValue();
         }
 
+        Duration expectedDuration = null;
+
 
         doReturn(gap1)
                 .doReturn(gap2)
                 .when(intervals).findGap(any(Interval.class), any(Duration.class));
-//        doReturn(gap2).when(intervals).findGap(any(Interval.class), any(Duration.class));
 
         doReturn(last.getValue()).when(intervals).lastGap();
 
+        if (expected != null) {
+            expectedDuration = expected.getValue();
+        }
+
         Day day = new Day(intervals, DateTime.now());
-        assertEquals(new Duration(expected.getValue()), day.restSplit());
+        assertEquals(expectedDuration, day.restSplit());
+    }
+
+    private void assertRestReduced(Hours expected, int reduced) {
+
     }
 }
