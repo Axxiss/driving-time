@@ -38,7 +38,7 @@ public class Week extends Rule {
     /**
      * Check is last week rest was reduced or not.
      *
-     * @return
+     * @return true if last week rest was reduced
      */
     protected boolean isLastRestReduced() {
         DateTime start = period.getStart().minusWeeks(1);
@@ -47,5 +47,14 @@ public class Week extends Rule {
         Interval lastWeek = new Interval(start, end);
 
         return intervals.findGap(lastWeek, Rest.NORMAL.getValue()) == null;
+    }
+
+
+    /**
+     * @return
+     */
+    protected Duration restRecovery() {
+//        if (isLastRestReduced())
+        return null;
     }
 }

@@ -3,12 +3,12 @@ package io.github.axxiss.drivingtime;
 import io.github.axxiss.drivingtime.rules.Fortnight;
 import io.github.axxiss.drivingtime.rules.day.Day;
 import io.github.axxiss.drivingtime.rules.week.Week;
-import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import static io.github.axxiss.drivingtime.Hours.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -38,51 +38,47 @@ public class DrivingTimeTest extends BaseTest {
 
     @Test
     public void nextDay() {
-        assertNextDay(0, 0, 0, new Duration(0));
-        assertNextDay(oneHour, 0, 0, new Duration(0));
-        assertNextDay(threeHours, 0, 0, new Duration(0));
-        assertNextDay(eightHours, 0, 0, new Duration(0));
+        assertNextDay(h0, h0, h0, h0);
+        assertNextDay(h1, h0, h0, h0);
+        assertNextDay(h3, h0, h0, h0);
+        assertNextDay(h8, h0, h0, h0);
 
-        assertNextDay(oneHour, fourHours, tenHours, new Duration(oneHour));
-        assertNextDay(threeHours, fourHours, tenHours, new Duration(threeHours));
-        assertNextDay(eightHours, fourHours, tenHours, new Duration(fourHours));
+        assertNextDay(h1, h4, h10, h1);
+        assertNextDay(h3, h4, h10, h3);
+        assertNextDay(h8, h4, h10, h4);
 
-        assertNextDay(oneHour, tenHours, threeHours, new Duration(oneHour));
-        assertNextDay(threeHours, tenHours, threeHours, new Duration(threeHours));
-        assertNextDay(eightHours, tenHours, threeHours, new Duration(threeHours));
+        assertNextDay(h1, h10, h3, h1);
+        assertNextDay(h3, h10, h3, h3);
+        assertNextDay(h8, h10, h3, h3);
     }
 
     @Test
     public void nextWeek() {
-        assertNextWeek(0, 0, new Duration(0));
+        assertNextWeek(h0, h0, h0);
 
-        assertNextWeek(oneHour, eightHours, new Duration(oneHour));
-        assertNextWeek(fiveHours, eightHours, new Duration(fiveHours));
-        assertNextWeek(eightHours, eightHours, new Duration(eightHours));
+        assertNextWeek(h1, h8, h1);
+        assertNextWeek(h5, h8, h5);
+        assertNextWeek(h8, h8, h8);
 
-        assertNextWeek(oneHour, fiveHours, new Duration(oneHour));
-        assertNextWeek(fiveHours, fiveHours, new Duration(fiveHours));
-        assertNextWeek(eightHours, fiveHours, new Duration(fiveHours));
+        assertNextWeek(h1, h5, h1);
+        assertNextWeek(h5, h5, h5);
+        assertNextWeek(h8, h5, h5);
 
     }
 
-    private void assertNextDay(long dayMillis, long weekMillis, long fortnightMillis, Duration expected) {
-        mockTime(dayMillis, weekMillis, fortnightMillis);
-        assertEquals(expected, drivingTime.nextDay());
+    private void assertNextDay(Hours day, Hours week, Hours fortnight, Hours expected) {
+        mockTime(day, week, fortnight);
+        assertEquals(expected.getValue(), drivingTime.nextDay());
     }
 
-    private void assertNextWeek(long weekMillis, long fortnightMillis, Duration expected) {
-        mockTime(0, weekMillis, fortnightMillis);
-        assertEquals(expected, drivingTime.nextWeek());
+    private void assertNextWeek(Hours week, Hours fortnight, Hours expected) {
+        mockTime(h0, week, fortnight);
+        assertEquals(expected.getValue(), drivingTime.nextWeek());
     }
 
-    private void mockTime(long dayMillis, long weekMillis, long fortnightMillis) {
-        Duration dayDuration = new Duration(dayMillis);
-        Duration weekDuration = new Duration(weekMillis);
-        Duration fortnightDuration = new Duration(fortnightMillis);
-
-        when(day.getAvailable()).thenReturn(dayDuration);
-        when(week.getAvailable()).thenReturn(weekDuration);
-        when(fortnight.getAvailable()).thenReturn(fortnightDuration);
+    private void mockTime(Hours day, Hours week, Hours fortnight) {
+        when(this.day.getAvailable()).thenReturn(day.getValue());
+        when(this.week.getAvailable()).thenReturn(week.getValue());
+        when(this.fortnight.getAvailable()).thenReturn(fortnight.getValue());
     }
 }

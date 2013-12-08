@@ -82,6 +82,24 @@ public class WeekTest extends BaseTest {
         assertFalse(week.isLastRestReduced());
     }
 
+    @Test
+    public void restRecovery_completed() {
+        assertRestRecovery(h0, h24, h21, h0);
+        assertRestRecovery(h0, h24, h21, h10);
+        assertRestRecovery(h0, h24, h21, h30);
+
+        assertRestRecovery(h0, h30, h11, h0);
+        assertRestRecovery(h0, h30, h11, h10);
+        assertRestRecovery(h0, h30, h11, h30);
+    }
+
+    @Test
+    public void restRecovery_uncompleted() {
+        assertRestRecovery(h18, h24, null, h3);
+        assertRestRecovery(h1, h24, null, h20);
+        assertRestRecovery(h1, h30, null, h10);
+    }
+
 
     private void mockData(long overlap) {
         Duration d = new Duration(overlap);
@@ -115,5 +133,14 @@ public class WeekTest extends BaseTest {
 
         Week week = spy(new Week(intervals, DateTime.now()));
         assertEquals(expectedDuration, week.restReduced());
+    }
+
+    private void assertRestRecovery(Hours expected, Hours first, Hours second, Hours last) {
+        Duration gap = first == null ? null : first.getValue();
+        Duration expectedDuration = expected == null ? null : expected.getValue();
+
+
+        Week week = spy(new Week(intervals, DateTime.now()));
+        assertEquals(expectedDuration, week.restRecovery());
     }
 }
