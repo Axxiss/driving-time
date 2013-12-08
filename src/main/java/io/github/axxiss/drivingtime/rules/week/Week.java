@@ -56,10 +56,24 @@ public class Week extends Rule {
      */
     protected Duration restRecovery() {
         Duration gap = lastWeekRest();
-        if (gap.isShorterThan(Rest.NORMAL.getValue())) {
 
+        if (gap.isShorterThan(Rest.NORMAL.getValue())) {
+            DateTime start = period.getStart().minusWeeks(1);
+            DateTime end = period.getEnd();
+
+            Interval lastTwoWeek = new Interval(start, end);
+
+
+            Duration pending = Rest.NORMAL.getValue().minus(gap);
+            Duration found = intervals.findGap(lastTwoWeek, pending);
+
+            if (found == null) {
+                found = intervals.lastGap();
+            }
+
+            return Utils.safeMinus(pending, found);
         }
 
-        return null;
+        return new Duration(0);
     }
 }

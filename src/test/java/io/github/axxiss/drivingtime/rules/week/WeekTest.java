@@ -71,16 +71,16 @@ public class WeekTest extends BaseTest {
         assertRestRecovery(h0, h24, h21, h10);
         assertRestRecovery(h0, h24, h21, h30);
 
-        assertRestRecovery(h0, h30, h11, h0);
-        assertRestRecovery(h0, h30, h11, h10);
-        assertRestRecovery(h0, h30, h11, h30);
+        assertRestRecovery(h0, h30, h15, h0);
+        assertRestRecovery(h0, h30, h15, h10);
+        assertRestRecovery(h0, h30, h15, h30);
     }
 
     @Test
     public void restRecovery_uncompleted() {
         assertRestRecovery(h18, h24, hNull, h3);
         assertRestRecovery(h1, h24, hNull, h20);
-        assertRestRecovery(h1, h30, hNull, h10);
+        assertRestRecovery(h5, h30, hNull, h10);
     }
 
     private void assertRest(Hours expected, Hours rest) {
@@ -102,6 +102,10 @@ public class WeekTest extends BaseTest {
 
     private void assertRestRecovery(Hours expected, Hours first, Hours second, Hours last) {
         Week week = spy(new Week(intervals, DateTime.now()));
+
+        doReturn(first.getValue()).when(week).lastWeekRest();
+        mockFindGap(second);
+        mockLastGap(last);
         assertEquals(expected.getValue(), week.restRecovery());
     }
 }
