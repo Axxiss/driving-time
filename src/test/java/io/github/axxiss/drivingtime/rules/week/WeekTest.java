@@ -1,4 +1,4 @@
-package io.github.axxiss.drivingtime.rules;
+package io.github.axxiss.drivingtime.rules.week;
 
 import io.github.axxiss.drivingtime.BaseTest;
 import io.github.axxiss.drivingtime.Hours;
@@ -15,7 +15,7 @@ import org.junit.runners.JUnit4;
 import java.util.Date;
 
 import static io.github.axxiss.drivingtime.Hours.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
@@ -44,7 +44,7 @@ public class WeekTest extends BaseTest {
     public void calcAvailable() {
         mockData(0);
         week = new Week(intervals, DateTime.now());
-        assertEquals(week.max, week.getAvailable());
+        assertEquals(week.getMax(), week.getAvailable());
     }
 
 
@@ -53,6 +53,22 @@ public class WeekTest extends BaseTest {
         assertRest(h0, h45);
         assertRest(h21, h24);
         assertRest(h45, h0);
+    }
+
+    @Test
+    public void restReduced_notFound() {
+        assertRestReduced(h24, h45, h0);
+    }
+
+    @Test
+    public void isLastRestReduced() {
+        Week week = new Week(intervals, DateTime.now());
+
+        doReturn(null).when(intervals).findGap(any(Interval.class), any(Duration.class));
+        assertTrue(week.isLastRestReduced());
+
+        doReturn(h45.getValue()).when(intervals).findGap(any(Interval.class), any(Duration.class));
+        assertFalse(week.isLastRestReduced());
     }
 
 
@@ -76,5 +92,15 @@ public class WeekTest extends BaseTest {
         assertEquals(new Duration(expected.getValue()), week.calcRest());
     }
 
+    private void assertRestReduced(Hours expected, Hours rest, Hours last) {
 
+        Duration gap = rest == null ? null : rest.getValue();
+
+
+        doReturn(gap).when(intervals).findGap(any(Interval.class), any(Duration.class));
+
+
+        Week week = spy(new Week(intervals, DateTime.now()));
+        assertEquals(expected.getValue(), week.restReduced());
+    }
 }

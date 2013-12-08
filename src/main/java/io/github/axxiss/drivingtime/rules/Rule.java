@@ -88,7 +88,7 @@ public abstract class Rule {
      *
      * @return rest duration.
      */
-    protected Duration calcRest() {
+    public Duration calcRest() {
 
         Duration gap = intervals.findGap(period, rest);
 
