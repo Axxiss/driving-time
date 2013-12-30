@@ -30,10 +30,11 @@ public class DrivingTime {
     /**
      * Creates a new driving time instance.
      */
-    public DrivingTime(Day day, Week week, Fortnight fortnight) {
+    public DrivingTime(Day day, Week week, Fortnight fortnight, IntervalList intervals) {
         this.day = day;
         this.week = week;
         this.fortnight = fortnight;
+        this.driveIntervals = intervals;
     }
 
     /**

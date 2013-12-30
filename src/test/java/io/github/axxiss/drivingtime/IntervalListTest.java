@@ -4,7 +4,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,18 +22,18 @@ public class IntervalListTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void evenArguments() {
-        Date[] dates = new Date[1];
-        dates[0] = new Date();
-        new IntervalList(dates);
+        List<Calendar> list = new ArrayList<Calendar>(1);
+        list.add(Calendar.getInstance());
+        new IntervalList(list);
     }
 
     @Test
     public void construction() {
         int size = 30;
-        Date[] dates = new Date[size];
+        List<Calendar> dates = new ArrayList<>(30);
 
         for (int i = 0; i < size; i++) {
-            dates[i] = new Date();
+            dates.add(Calendar.getInstance());
         }
 
         IntervalList list = new IntervalList(dates);

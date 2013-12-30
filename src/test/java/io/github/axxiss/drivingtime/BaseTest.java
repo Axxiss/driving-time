@@ -7,7 +7,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.stubbing.Stubber;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -28,7 +30,8 @@ public abstract class BaseTest {
 
     @Before
     public void setUp() throws Exception {
-        intervals = spy(new IntervalList(new Date[0]));
+        List<Calendar> list = new ArrayList<Calendar>();
+        intervals = spy(new IntervalList(list));
     }
 
     protected void mockFindGap(Hours... args) {

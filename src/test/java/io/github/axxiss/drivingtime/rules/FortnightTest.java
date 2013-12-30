@@ -9,7 +9,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Calendar;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -32,7 +33,7 @@ public class FortnightTest {
 
     @Before
     public void setUp() throws Exception {
-        intervals = spy(new IntervalList(new Date[0]));
+        intervals = spy(new IntervalList(new ArrayList<Calendar>()));
     }
 
     @Test

@@ -5,7 +5,9 @@ import org.joda.time.Duration;
 import org.joda.time.Interval;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * IntervalList adds time manipulation functionality to an {@link ArrayList}.
@@ -17,15 +19,20 @@ public class IntervalList extends ArrayList<Interval> {
      *
      * @param intervals size must be odd.
      */
-    public IntervalList(Date[] intervals) {
-        super(intervals.length);
+    public IntervalList(List<Calendar> intervals) {
+        super(intervals.size());
 
-        if (intervals.length % 2 != 0) {
+        int size = intervals.size();
+        if (size % 2 != 0) {
             throw new IllegalArgumentException("Intervals parameter must be an odd number.");
         }
 
-        for (int i = 0; i < intervals.length; i += 2) {
-            add(new Interval(intervals[i].getTime(), intervals[i + 1].getTime()));
+        Iterator<Calendar> it = intervals.iterator();
+
+        while (it.hasNext()) {
+            Calendar start = it.next();
+            Calendar end = it.next();
+            add(new Interval(start.getTimeInMillis(), end.getTimeInMillis()));
         }
     }
 
@@ -74,6 +81,7 @@ public class IntervalList extends ArrayList<Interval> {
             if (overlap(inner).isLongerThan(threshold)) {
                 count++;
             }
+            index++;
         }
 
         return count;

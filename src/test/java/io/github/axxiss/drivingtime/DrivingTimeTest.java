@@ -32,7 +32,7 @@ public class DrivingTimeTest extends BaseTest {
         week = mock(Week.class);
         fortnight = mock(Fortnight.class);
 
-        drivingTime = new DrivingTime(day, week, fortnight);
+        drivingTime = new DrivingTime(day, week, fortnight, null);
     }
 
 
