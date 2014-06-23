@@ -77,7 +77,7 @@ public class DrivingTime {
 
         Interval interval = new Interval(start, now);
 
-        Duration overlap = driveIntervals.overlap(interval);
+        Duration overlap = new Duration(driveIntervals.overlap(interval));
 
         return Driving.NONSTOP.minus(overlap);
     }

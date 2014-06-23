@@ -2,11 +2,20 @@ package io.github.axxiss.drivingtime.rules.day;
 
 import io.github.axxiss.drivingtime.BaseTest;
 import io.github.axxiss.drivingtime.Hours;
+import io.github.axxiss.drivingtime.IntervalList;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 import static io.github.axxiss.drivingtime.Hours.*;
 import static org.junit.Assert.assertEquals;

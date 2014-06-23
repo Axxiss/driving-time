@@ -42,19 +42,17 @@ public class IntervalList extends ArrayList<Interval> {
      * @param interval the interval to check the overlap.
      * @return the overlap.
      */
-    public Duration overlap(Interval interval) {
-        Duration amount = new Duration(0);
+    public long overlap(Interval interval) {
+        long millis = 0;
 
-        //To handle large amount of data it is best to use binary search.
         for (Interval i : this) {
             Interval match = interval.overlap(i);
 
-            if (match != null) {
-                amount.plus(match.toDurationMillis());
+            if (match != null && match.toDurationMillis() > 0) {
+                millis += match.toDurationMillis();
             }
         }
-
-        return amount;
+        return millis;
     }
 
     /**
@@ -78,7 +76,7 @@ public class IntervalList extends ArrayList<Interval> {
 
             inner = new Interval(start, end);
 
-            if (overlap(inner).isLongerThan(threshold)) {
+            if (overlap(inner) > threshold.getMillis()) {
                 count++;
             }
             index++;

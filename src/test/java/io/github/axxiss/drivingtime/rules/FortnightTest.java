@@ -45,7 +45,7 @@ public class FortnightTest {
 
     private void mockData(long overlap) {
         Duration d = new Duration(overlap);
-        doReturn(d).when(intervals).overlap(any(Interval.class));
+        doReturn(overlap).when(intervals).overlap(any(Interval.class));
     }
 
 

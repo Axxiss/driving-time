@@ -46,7 +46,7 @@ public abstract class BaseTest {
     }
 
     protected void mockOverlap(Hours overlap) {
-        doReturn(overlap.getValue()).when(intervals).overlap(any(Interval.class));
+        doReturn(overlap.getValue().getMillis()).when(intervals).overlap(any(Interval.class));
     }
 
     protected void mockCountDurationInterval(int count) {

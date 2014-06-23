@@ -50,7 +50,7 @@ public abstract class Rule {
         this.max = new Duration(max);
         period = new Interval(start, end);
         this.intervals = intervals;
-        driving = intervals.overlap(period);
+        driving = new Duration(intervals.overlap(period));
         available = available();
     }
 
